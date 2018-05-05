@@ -8,6 +8,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using StorageChallenge.Models;
 using StorageChallenge.Testing;
+using Microsoft.Azure;
 
 namespace StorageChallenge.Controllers
 {
@@ -21,7 +22,15 @@ namespace StorageChallenge.Controllers
         public ActionResult Files()
         {
             ViewBag.Result = new BlobTestResult();
-            return View(new FileTestData());
+            var fd = new FileTestData {Advanced = CloudConfigurationManager.GetSetting("Advanced") == "true" };
+
+            if (fd.Advanced)
+            {
+                fd.storageAccountName = CloudConfigurationManager.GetSetting("StorageAccountName");
+                fd.storageAccountKey = CloudConfigurationManager.GetSetting("StorageAccountKey");
+                fd.storageAccountSAS = CloudConfigurationManager.GetSetting("StorageAccountSAS");
+            }
+            return View(fd);
         }
         [HttpPost]
         public ActionResult Files(FileTestData data)

@@ -36,6 +36,9 @@
             <p>&copy; @DateTime.Now.Year - Learn on Demand Systems LLC</p>
         </footer>
     </div>
+    <div class="hidden">
+       Test Status (blank is untested): @System.Web.HttpContext.Current.Cache["TestStatus"] 
+    </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

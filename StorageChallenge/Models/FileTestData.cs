@@ -14,5 +14,6 @@ namespace StorageChallenge.Models
         public string storageAccountKey { get; set; }
         [Display(Name = "Shared access signature")]
         public string storageAccountSAS { get; set; }
+        public bool Advanced { get; set; }
     }
 }

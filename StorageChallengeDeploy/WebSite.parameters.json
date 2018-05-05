@@ -4,6 +4,9 @@
   "parameters": {
     "webSiteName": {
       "value": "tswtest"
+    },
+    "testType": {
+      "value": "3"
     }
   }
 }
