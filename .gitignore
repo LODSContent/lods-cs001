@@ -10,6 +10,9 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+#Challenge Description file
+TWallaceChallengeSeries1.xlsx
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
