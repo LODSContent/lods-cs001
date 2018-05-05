@@ -1,5 +1,6 @@
-﻿@model StorageChallenge.Controllers.FileTestData
+﻿@model StorageChallenge.Models.FileTestData
 @using StorageChallenge.Controllers
+@using StorageChallenge.Testing
 @{
     ViewBag.Title = "Files";
 }
@@ -10,43 +11,43 @@
 {
     @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.storageAccountName, htmlAttributes: new { @class = "control-label " })
-            @Html.EditorFor(model => model.storageAccountName, new { htmlAttributes = new { @class = "form-control", placeholder = "enter name" } })
-            @Html.ValidationMessageFor(model => model.storageAccountName, "", new { @class = "text-danger" })
-        </div>
+<div class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.storageAccountName, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.storageAccountName, new { htmlAttributes = new { @class = "form-control", placeholder = "enter name" } })
+        @Html.ValidationMessageFor(model => model.storageAccountName, "", new { @class = "text-danger" })
+    </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.storageAccountKey, htmlAttributes: new { @class = "control-label " })
-            @Html.EditorFor(model => model.storageAccountKey, new { htmlAttributes = new { @class = "form-control", placeholder = "enter key" } })
-            @Html.ValidationMessageFor(model => model.storageAccountKey, "", new { @class = "text-danger" })
-        </div>
-        @if (TestType.TestPrivateStorage)
-        {
+    <div class="form-group">
+        @Html.LabelFor(model => model.storageAccountKey, htmlAttributes: new { @class = "control-label " })
+        @Html.EditorFor(model => model.storageAccountKey, new { htmlAttributes = new { @class = "form-control", placeholder = "enter key" } })
+        @Html.ValidationMessageFor(model => model.storageAccountKey, "", new { @class = "text-danger" })
+    </div>
+    @if (TestType.TestPrivateStorage)
+    {
         <div class="form-group">
             @Html.LabelFor(model => model.storageAccountSAS, htmlAttributes: new { @class = "control-label " })
             @Html.EditorFor(model => model.storageAccountSAS, new { htmlAttributes = new { @class = "form-control", placeholder = "enter SAS" } })
             @Html.ValidationMessageFor(model => model.storageAccountSAS, "", new { @class = "text-danger" })
         </div>
-        }
-        <div class="form-group">
-            <input type="submit" value="Test" class="btn btn-default" />
-        </div>
-        @ViewBag.Status
-        <br />
+    }
+    <div class="form-group">
+        <input type="submit" value="Test" class="btn btn-default" />
+    </div>
+
+    @if (!ViewBag.Result.Ignore)
+    {
+        <h3>@ViewBag.Result.Status</h3>
         <ul>
-            @if (ViewBag.Uris != null)
-            {
-                foreach (var uri in (List<string>)ViewBag.Uris)
+                @foreach (var uri in (List<string>)ViewBag.Result.PublicBlobs)
                 {
                     <li> <a href="@Html.Raw(uri)">@Html.Raw(uri)</a></li>
                 }
-            }
         </ul>
-    </div>
+    }
+</div>
 }
 
 

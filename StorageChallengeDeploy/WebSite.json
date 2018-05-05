@@ -8,18 +8,18 @@
     },
     "packageURI": {
       "type": "string",
-      "defaultValue": "https://github.com/twallace27603/lods-cs001/tree/master/StorageChallenge/bin"
+      "defaultValue": "https://github.com/twallace27603/lods-cs001/blob/master/StorageChallenge/deploy/StorageChallenge.zip?raw=true"
     },
     "testType": {
-      "type": "int",
-      "defaultValue": 255
+      "type": "string",
+      "defaultValue": "255"
     }
 
 
   },
   "variables": {
     "hostingPlanName": "dataASP",
-    "skuName": "F1",
+    "skuName": "B1",
     "skuCapacity": "1"
   },
   "resources": [
@@ -123,11 +123,11 @@
             "displayName": "Web App Settings"
           },
           "properties": {
-            "TestType": {
-              "value": "[parameters('testType')]"
-            }
+            "TestType": "[parameters('testType')]"
           }
         }
+          
+        
       ]
 
     }

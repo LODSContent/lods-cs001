@@ -6,6 +6,8 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using StorageChallenge.Models;
+using StorageChallenge.Testing;
 
 namespace StorageChallenge.Controllers
 {
@@ -18,49 +20,29 @@ namespace StorageChallenge.Controllers
         [HttpGet]
         public ActionResult Files()
         {
-            ViewBag.Status = "Click Test to test";
+            ViewBag.Result = new BlobTestResult();
             return View(new FileTestData());
         }
         [HttpPost]
         public ActionResult Files(FileTestData data)
         {
-            var uris = new List<string>();
-            try
+            var test = new Test();
+            BlobTestResult result = null;
+            if(TestType.TestPublicStorage && TestType.TestPrivateStorage)
             {
-                var account = new CloudStorageAccount(new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(data.storageAccountName, data.storageAccountKey), true);
-                var client = account.CreateCloudBlobClient();
-                var container = client.GetContainerReference("public");
-                if(container.Exists())
-                {
-                    if(container.GetPermissions().PublicAccess == BlobContainerPublicAccessType.Blob)
-                    {
-                        foreach(var blob in container.ListBlobs())
-                        {
-                            uris.Add(blob.Uri.AbsoluteUri);
-                        }
-                        if (uris.Count > 0)
-                        {
-                            ViewBag.Uris = uris;
-                            ViewBag.Status = "You have completed this challenge successfully.  You can test the links below:";
-                        } else
-                        {
-                            ViewBag.Status = "You have configured the storage container correctly, but there are no blobs in the container.";
-                        }
-                    } else
-                    {
-                        ViewBag.Status = "Your container does not have the correct security setting.";
-                    }
-                } else
-                {
-                    ViewBag.Status = "Public container does not exist.";
-                }
+                var privateResult = test.TestPrivateBlob(data);
+                var publicResult = test.TestPublicBlob(data);
+                result = new BlobTestResult(privateResult,publicResult);
             }
-            catch
+            else if(TestType.TestPublicStorage)
             {
-                ViewBag.Status = "Invalid storage account or key.";
-
+                result = test.TestPublicBlob(data);
             }
-            ViewBag.Uris = uris;
+            else
+            {
+                result = test.TestPrivateBlob(data);
+            }
+            ViewBag.Result = result;
             return View(data);
         }
 
@@ -79,13 +61,5 @@ namespace StorageChallenge.Controllers
         }
     }
 
-    public class FileTestData
-    {
-        [Display(Name="Storage account name")]
-        public string storageAccountName { get; set; }
-        [Display(Name = "Storage account key")]
-        public string storageAccountKey { get; set; }
-        [Display(Name = "Shared access signature")]
-        public string storageAccountSAS { get; set; }
-    }
+
 }
