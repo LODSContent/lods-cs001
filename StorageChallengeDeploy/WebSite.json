@@ -2,13 +2,17 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "webSiteName": {
+    "webSitePrefix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "webSiteSuffix": {
       "type": "string",
       "minLength": 1
     },
     "packageURI": {
       "type": "string",
-      "defaultValue": "https://github.com/twallace27603/lods-cs001/blob/master/StorageChallenge/deploy/StorageChallenge.zip?raw=true"
+      "defaultValue": "https://github.com/twallace27603/lods-cs001/blob/master/StorageChallenge/deploy/guided/StorageChallenge.zip?raw=true"
     },
     "testType": {
       "type": "string",
@@ -20,7 +24,8 @@
   "variables": {
     "hostingPlanName": "dataASP",
     "skuName": "B1",
-    "skuCapacity": "1"
+    "skuCapacity": "1",
+    "webSiteName": "[concat(parameters('webSitePrefix'),parameters('webSiteSuffix'))]"
   },
   "resources": [
     {
@@ -41,7 +46,7 @@
     },
     {
       "apiVersion": "2015-08-01",
-      "name": "[parameters('webSiteName')]",
+      "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -52,7 +57,7 @@
         "[resourceId('Microsoft.Web/serverfarms/', variables('hostingPlanName'))]"
       ],
       "properties": {
-        "name": "[parameters('webSiteName')]",
+        "name": "[variables('webSiteName')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
 
       },
@@ -62,8 +67,8 @@
           "name": "web",
           "type": "config",
           "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]",
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'), '/extensions/MSDeploy')]"
+            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]",
+            "[concat('Microsoft.Web/sites/', variables('webSiteName'), '/extensions/MSDeploy')]"
           ],
           "tags": {
             "displayName": "Web App Config"
@@ -84,7 +89,7 @@
           "location": "[resourceGroup().location]",
           "apiVersion": "2015-08-01",
           "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
+            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]"
           ],
           "tags": {
             "displayName": "WebAppMSDeploy"
@@ -94,30 +99,12 @@
           }
         },
         {
-          "name": "connectionstrings",
-          "type": "config",
-          "apiVersion": "2015-08-01",
-          "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]",
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'), '/extensions/MSDeploy')]"
-          ],
-          "tags": {
-            "displayName": "WebAppConnectionStrings"
-          },
-          "properties": {
-            "BlobConnection": {
-              "value": "[variables('hostingPlanName')]",
-              "type": "Custom"
-            }
-          }
-        },
-        {
           "name": "appsettings",
           "type": "config",
           "apiVersion": "2015-08-01",
           "dependsOn": [
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]",
-            "[concat('Microsoft.Web/sites/', parameters('webSiteName'), '/extensions/MSDeploy')]"
+            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]",
+            "[concat('Microsoft.Web/sites/', variables('webSiteName'), '/extensions/MSDeploy')]"
           ],
           "tags": {
             "displayName": "Web App Settings"
@@ -126,8 +113,8 @@
             "TestType": "[parameters('testType')]"
           }
         }
-          
-        
+
+
       ]
 
     }
