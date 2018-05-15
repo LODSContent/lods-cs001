@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -7,6 +8,12 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using StorageChallenge.Models;
+using MySql.Data;
+using MySql.Data.MySqlClient;
+using Microsoft.Azure.Documents.Client;
+using System.Threading.Tasks;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
 
 namespace StorageChallenge.Testing
 {
@@ -151,6 +158,158 @@ namespace StorageChallenge.Testing
             setTestStatus(result, TestTypeEnum.PrivateStorage);
             return result;
 
+        }
+
+        public DataTestResult TestSQLServer(SQLTestData data)
+        {
+            DataTestResult result = new DataTestResult();
+            try
+            {
+                using (var conn = new SqlConnection(data.SQLConnection))
+                {
+                    var SQL = "SELECT * FROM Sales.SalesPerson;";
+                    var cmd = new SqlCommand(SQL, conn);
+                    conn.Open();
+                    var rdr = cmd.ExecuteReader();
+                    while (rdr.Read())
+                    {
+                        result.SalesPeople.Add(new SalesPerson { ID = (int)rdr["ID"], FirstName = rdr["FirstName"].ToString(), LastName = rdr["LastName"].ToString(), Phone = rdr["Phone"].ToString() });
+                    }
+                    if(result.SalesPeople.Count==0)
+                    {
+                        result.Passed = false;
+                        result.Status = "The connection to SQL Server worked, but there was no data";
+                    } else
+                    {
+                        result.Passed = true;
+                        result.Status = "Passed all SQL Server tests.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Passed = false;
+                result.Status = $"Encountered an error: {ex.Message}";
+            }
+
+
+            return result;
+        }
+
+        public DataTestResult TestMySQL(SQLTestData data)
+        {
+            DataTestResult result = new DataTestResult();
+            try
+            {
+                MySqlConnection conn = new MySqlConnection(data.MySQLConnection);
+                string SQL = "SELECT * FROM customer;";
+                MySqlCommand cmd = new MySqlCommand(SQL, conn);
+                conn.Open();
+                try
+                {
+                    var rdr = cmd.ExecuteReader();
+                    while (rdr.Read())
+                    {
+                        result.Customers.Add(new Customer { id = (int)rdr["id"], name = rdr["name"].ToString() });
+                    }
+                    if (result.Customers.Count == 0)
+                    {
+                        result.Passed = false;
+                        result.Status = "The connection to MySQL is correct but returned no data";
+                    } else
+                    {
+                        result.Passed = true;
+                        result.Status = "Passed all MySQL tests.";
+                    }
+                } finally
+                {
+                    conn.Close();
+                }
+            } catch(Exception ex)
+            {
+                result.Passed = false;
+                result.Status = $"Encountered an error: {ex.Message}";
+            }
+
+
+            return result;
+
+        }
+
+        public NoSQLTestResult TestCosmos(CosmosTestData data)
+        {
+            var result = new NoSQLTestResult();
+            try
+            {
+                
+                DocumentClient client = new DocumentClient(new Uri(data.CosmosDBUri), data.CosmosDBKey);
+                // Query using partition key
+                IQueryable<Listing> query = client.CreateDocumentQuery<Listing>(
+                    UriFactory.CreateDocumentCollectionUri("realEstate", "listings"))
+                    .Where(m => m.State != "AZ");
+                foreach (var listing in query)
+                {
+                    result.AllListings.Add(listing);
+                }
+                if(result.AllListings.Count>0)
+                {
+                    result.Passed = true;
+                    result.Status = "Cosmos DB is properly configured.";
+                } else
+                {
+                    result.Passed = false;
+                    result.Status = "Cosmos DB does not have any qualifying data.";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Passed = false;
+                result.Status = $"There was an error processing the Cosmos DB database: {ex.Message}";
+            }
+
+            return result;
+        }
+
+        public NoSQLTestResult TestSearch(CosmosTestData data)
+        {
+            var result = new NoSQLTestResult();
+            try
+            {
+                string searchServiceName = data.SearchName;
+
+                string queryApiKey = data.SearchKey;
+
+                SearchIndexClient indexClient = new SearchIndexClient(searchServiceName, "documentdb-index", new SearchCredentials(queryApiKey));
+                SearchParameters parameters;
+ 
+
+                parameters =
+                    new SearchParameters()
+                    {
+                        Select = new[] { "PropertyID", "Street", "City", "State", "PostalCode", "Description", "Price" },
+                        Filter = "Price lt 900000000000.00"
+                    };
+
+                DocumentSearchResult<Listing> results = indexClient.Documents.Search<Listing>("*", parameters);
+                foreach(SearchResult<Listing> document in results.Results)
+                {
+                    result.SearchResults.Add(document.Document);
+                }
+                if (result.SearchResults.Count > 0)
+                {
+                    result.Passed = true;
+                    result.Status = "Search is properly configured";
+                } else
+                {
+                    result.Passed = false;
+                    result.Status = "Search returned zero results";
+                }
+            } catch(Exception ex)
+            {
+                result.Status = $"Search encountered an error: {ex.Message}";
+                result.Passed = false;
+            }
+            return result;
         }
 
         private void setTestStatus(BlobTestResult result, TestTypeEnum type)

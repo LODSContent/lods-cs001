@@ -54,7 +54,81 @@ namespace StorageChallenge.Controllers
             ViewBag.Result = result;
             return View(data);
         }
+        [HttpGet]
+        public ActionResult Database()
+        {
+            SQLTestData sd = new SQLTestData() {Advanced = CloudConfigurationManager.GetSetting("Advanced") == "true" };
+            if(sd.Advanced)
+            {
+                sd.SQLConnection = System.Configuration.ConfigurationManager.ConnectionStrings["CorpDataConnectionString"].ConnectionString;
+                sd.MySQLConnection = System.Configuration.ConfigurationManager.ConnectionStrings["CustomerDataConnectionString"].ConnectionString;
+            }
+            ViewBag.Result = new DataTestResult();
+            return View(sd);
+        }
+        [HttpPost]
+        public ActionResult Database(SQLTestData data)
+        {
 
+            var test = new Test();
+            DataTestResult result = new DataTestResult();
+            if (TestType.TestSQLServer && TestType.TestMySQL)
+            {
+                var sqlResult = test.TestSQLServer(data);
+                var mySqlResult = test.TestMySQL(data);
+                result = new DataTestResult(sqlResult, mySqlResult);
+            }
+            else if (TestType.TestSQLServer)
+            {
+                result = test.TestSQLServer(data);
+            }
+            else
+            {
+                result = test.TestMySQL(data);
+            }
+            result.Ignore = false;
+            ViewBag.Result = result;
+            return View(data);
+        }
+
+        [HttpGet]
+        public ActionResult NoSQL()
+        {
+            CosmosTestData cd = new CosmosTestData() { Advanced = CloudConfigurationManager.GetSetting("Advanced") == "true" };
+            if (cd.Advanced)
+            {
+                cd.CosmosDBUri = CloudConfigurationManager.GetSetting("ListingsURI");
+                cd.CosmosDBKey = CloudConfigurationManager.GetSetting("ListingsKey");
+                cd.SearchName = CloudConfigurationManager.GetSetting("SearchAccount");
+                cd.SearchKey = CloudConfigurationManager.GetSetting("SearchKey");
+            }
+            ViewBag.Result = new DataTestResult() { Ignore = true };
+            return View(cd);
+        }
+
+        [HttpPost]
+        public ActionResult NoSQL(CosmosTestData data)
+        {
+            var test = new Test();
+            NoSQLTestResult result = new NoSQLTestResult() { Ignore = false };
+            if (TestType.TestCosmosDB && TestType.TestSearch)
+            {
+                var cosmosDBResult = test.TestCosmos(data);
+                var searchResult = test.TestSearch(data);
+                result = new NoSQLTestResult(cosmosDBResult, searchResult);
+            }
+            else if (TestType.TestCosmosDB)
+            {
+                result = test.TestCosmos(data);
+            }
+            else
+            {
+                result = test.TestSearch(data);
+            }
+            result.Ignore = false;
+            ViewBag.Result = result;
+            return View(data);
+        }
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
