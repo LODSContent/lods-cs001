@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
   <setParameter name="IIS Web Application Name" value="/" />
-  <setParameter name="CorpDataConnectionString-Web.config Connection String" value="Server=tcp:tswtrucksmart.database.windows.net,1433;Initial Catalog=CorpData;Persist Security Info=False;User ID=student;Password=GKPa$$w0rd12;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" />
-  <setParameter name="CustomerDataConnectionString-Web.config Connection String" value="Server=tswlods.mysql.database.azure.com; Port=3306; Database=customerData; Uid=student@tswlods; Pwd=GKPa$$w0rd12;" />
+  <setParameter name="CorpDataConnectionString-Web.config Connection String" value="" />
+  <setParameter name="CustomerDataConnectionString-Web.config Connection String" value="" />
 </parameters>

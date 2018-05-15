@@ -282,6 +282,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Models\BlobTestResult.cs" />
     <Compile Include="Models\CosmosTestData.cs" />
     <Compile Include="Models\FileTestData.cs" />
