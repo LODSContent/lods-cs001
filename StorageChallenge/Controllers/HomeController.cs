@@ -35,7 +35,7 @@ namespace StorageChallenge.Controllers
         [HttpPost]
         public ActionResult Files(FileTestData data)
         {
-            var test = new Test();
+            var test = new TestProcessor();
             BlobTestResult result = null;
             if(TestType.TestPublicStorage && TestType.TestPrivateStorage)
             {
@@ -70,7 +70,7 @@ namespace StorageChallenge.Controllers
         public ActionResult Database(SQLTestData data)
         {
 
-            var test = new Test();
+            var test = new TestProcessor();
             DataTestResult result = new DataTestResult();
             if (TestType.TestSQLServer && TestType.TestMySQL)
             {
@@ -109,7 +109,7 @@ namespace StorageChallenge.Controllers
         [HttpPost]
         public ActionResult NoSQL(CosmosTestData data)
         {
-            var test = new Test();
+            var test = new TestProcessor();
             NoSQLTestResult result = new NoSQLTestResult() { Ignore = false };
             if (TestType.TestCosmosDB && TestType.TestSearch)
             {

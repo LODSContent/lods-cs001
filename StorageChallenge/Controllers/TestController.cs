@@ -13,7 +13,7 @@ namespace StorageChallenge.Controllers
 {
     public class TestController : ApiController
     {
-        private Test test = new Test();
+        private TestProcessor test = new TestProcessor();
         private FileTestData fileTestData
         {
             get
@@ -21,8 +21,8 @@ namespace StorageChallenge.Controllers
                 return new FileTestData
                 {
                     Advanced = true,
-                    storageAccountKey = CloudConfigurationManager.GetSetting("StorageAccountName"),
-                    storageAccountName = CloudConfigurationManager.GetSetting("StorageAccountKey"),
+                    storageAccountKey = CloudConfigurationManager.GetSetting("StorageAccountKey"),
+                    storageAccountName = CloudConfigurationManager.GetSetting("StorageAccountName"),
                     storageAccountSAS = CloudConfigurationManager.GetSetting("StorageAccountSAS")
                 };
             }

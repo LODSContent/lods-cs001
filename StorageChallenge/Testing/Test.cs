@@ -17,10 +17,10 @@ using Microsoft.Azure.Search.Models;
 
 namespace StorageChallenge.Testing
 {
-    public class Test
+    public class TestProcessor
     {
         System.Web.Caching.Cache cache = null;
-        public Test()
+        public TestProcessor()
         {
             cache = System.Web.HttpContext.Current.Cache;
         }
@@ -264,7 +264,7 @@ namespace StorageChallenge.Testing
             catch (Exception ex)
             {
                 result.Passed = false;
-                result.Status = $"There was an error processing the Cosmos DB database: {ex.Message}";
+                result.Status = $"There was an error processing the Cosmos DB database: {ex.ToString()}";
             }
 
             return result;
