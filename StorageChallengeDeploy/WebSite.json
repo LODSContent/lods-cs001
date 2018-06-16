@@ -25,7 +25,12 @@
     "hostingPlanName": "dataASP",
     "skuName": "B1",
     "skuCapacity": "1",
-    "webSiteName": "[concat(parameters('webSitePrefix'),parameters('webSiteSuffix'))]"
+    "webSiteName": "[concat(parameters('webSitePrefix'),parameters('webSiteSuffix'))]",
+    "cosmosDbName": "[concat('cdb',parameters('webSiteSuffix'))]",
+    "cosmosDbOfferType": "Standard",
+    "cosmosDbKind": "GlobalDocumentDB",
+    "cosmosDbDefaultExperience": "DocumentDB"
+
   },
   "resources": [
     {
@@ -117,7 +122,22 @@
 
       ]
 
+    },
+    {
+      "apiVersion": "2015-04-08",
+      "condition": "[equals(parameters('testType'),'32')]",
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "kind": "[variables('cosmosDbKind')]",
+      "name": "[variables('cosmosDbName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[variables('cosmosDbName')]",
+        "databaseAccountOfferType": "[variables('cosmosDbOfferType')]"
+      },
+      "tags": {
+        "defaultExperience": "[variables('cosmosDbDefaultExperience')]",
+        "displayName": "Cosmos DB"
+      }
     }
-
   ]
 }

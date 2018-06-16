@@ -83,13 +83,16 @@ namespace StorageChallenge.Testing
                 var account = new CloudStorageAccount(new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(data.storageAccountName, data.storageAccountKey), true);
                 var client = account.CreateCloudBlobClient();
                 var container = client.GetContainerReference("private");
+                var metaDataExists = false;
                 if (container.Exists())
                 {
                     if (container.GetPermissions().PublicAccess == BlobContainerPublicAccessType.Off)
                     {
-                        foreach (var blob in container.ListBlobs())
+                        foreach (var blob in container.ListBlobs(blobListingDetails: BlobListingDetails.Metadata))
                         {
                             result.PrivateBlobs.Add(blob.Uri.AbsoluteUri);
+                          //Add test for metadata  
+                            
                         }
                         if (result.PrivateBlobs.Count > 0)
                         {
@@ -108,6 +111,7 @@ namespace StorageChallenge.Testing
                             }
                             if (SASpermission && SASobject)
                             {
+                               
                                 var url = result.PrivateBlobs[0] + "?" + data.storageAccountSAS;
                                 var rqst = WebRequest.CreateHttp(url);
                                 try

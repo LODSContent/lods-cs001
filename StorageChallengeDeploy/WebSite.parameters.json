@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "testType": {
-      "value": "3"
+      "value": "32"
     },
     "webSitePrefix": {
       "value": "tsw"
