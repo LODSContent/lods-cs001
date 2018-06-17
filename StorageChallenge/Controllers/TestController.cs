@@ -1,4 +1,6 @@
 ﻿using Microsoft.Azure;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 using StorageChallenge.Models;
 using StorageChallenge.Testing;
 
@@ -7,7 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
+using System.IO;
 
 namespace StorageChallenge.Controllers
 {
@@ -105,10 +109,67 @@ namespace StorageChallenge.Controllers
 
             return result;
         }
+        [HttpGet]
+        public async Task<bool> LoadCosmosDB()
+        {
+            var result = true;
+            try
+            {
+                var CosmosDBKey = CloudConfigurationManager.GetSetting("ListingsKey");
+                var CosmosDBUri = CloudConfigurationManager.GetSetting("ListingsURI");
+                var databaseName = "realEstate";
+                var collectionName = "listings";
+                var databaseID = databaseName;
+                DocumentClient client = new DocumentClient(new Uri(CosmosDBUri), CosmosDBKey);
+                var database = await client.CreateDatabaseIfNotExistsAsync(new Database { Id = databaseID });
+                DocumentCollection collectionSpec = new DocumentCollection
+                {
+                    Id = collectionName
+                };
+                DocumentCollection collection = await client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri(databaseID), collectionSpec, new RequestOptions { OfferThroughput = 400  });
 
 
+                IQueryable<Listing> query = client.CreateDocumentQuery<Listing>(
+    UriFactory.CreateDocumentCollectionUri(databaseName, collectionName));
+                if(query.Count<Listing>() == 0)
+                {
+                    string[] documents = { "https://lodschallenge.blob.core.windows.net/storagechallenges/Listing1.json",
+    "https://lodschallenge.blob.core.windows.net/storagechallenges/Listing2.json",
+    "https://lodschallenge.blob.core.windows.net/storagechallenges/Listing3.json"};
+                    //Load Documents
+                    foreach(string documentUri in documents)
+                    {
+                        await client.UpsertDocumentAsync(UriFactory.CreateDocumentCollectionUri("realEstate", "listings"), getListing(documentUri));
+                    }
+
+                }
 
 
+            }
+            catch
+            {
+                result = false;
+            }
+            return result;
+
+        }
+
+        private Listing getListing(string documentUri)
+        {
+            Listing result = null;
+            var request = HttpWebRequest.Create(documentUri);
+            var response = request.GetResponse();
+            using (var stream = response.GetResponseStream())
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    var data = reader.ReadToEnd();
+                    result = Newtonsoft.Json.JsonConvert.DeserializeObject<Listing>(data);
+                }
+            }
+                
+            return result;
+        }
     }
     public class TestResult
     {

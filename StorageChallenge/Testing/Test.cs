@@ -83,7 +83,7 @@ namespace StorageChallenge.Testing
                 var account = new CloudStorageAccount(new Microsoft.WindowsAzure.Storage.Auth.StorageCredentials(data.storageAccountName, data.storageAccountKey), true);
                 var client = account.CreateCloudBlobClient();
                 var container = client.GetContainerReference("private");
-                var metaDataExists = false;
+                //var metaDataExists = false;
                 if (container.Exists())
                 {
                     if (container.GetPermissions().PublicAccess == BlobContainerPublicAccessType.Off)
