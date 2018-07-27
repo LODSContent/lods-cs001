@@ -23,6 +23,13 @@
   <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
   <!-- vertag<:>end -->
   <ItemGroup>
+    <None Include="CSST01-03.Policy.json" />
+    <None Include="CSST04.Policy.json" />
+    <None Include="CSST05.Policy.json" />
+    <None Include="CSST06.Policy.json" />
+    <None Include="CSST07.Policy.json" />
+    <None Include="CSST08-09.Policy.json" />
+    <None Include="CSST10.Policy.json" />
     <None Include="Deployment.targets">
       <Visible>False</Visible>
     </None>
